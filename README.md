@@ -14,15 +14,22 @@ Steps:
 ```sh
 mise install
 uv sync
-docker compose up -d postgres
-uv run python manage.py migrate
-uv run python manage.py seed
-uv run python manage.py runserver
+make init
 ```
 
 API docs at <http://localhost:8000/api/docs>.
 
 Seeding writes ~100k posts and ~500k comments. Expect a few minutes.
+
+Useful development targets:
+
+```sh
+make check-deps
+make postgres
+make migrate
+make seed
+make runserver
+```
 
 To stop the database, run `docker compose down`. To reset all local database data,
 run `docker compose down -v`.
