@@ -12,6 +12,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "django-stubs[compatible-mypy]>=5.2",
+    "mypy>=1.19",
     "pytest>=9",
     "pytest-django>=4.11",
     "ruff>=0.14",
@@ -23,6 +25,15 @@ target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+python_version = "3.14"
+check_untyped_defs = true
+show_error_codes = true
+
+[tool.django-stubs]
+django_settings_module = "core.settings"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
