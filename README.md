@@ -7,14 +7,14 @@ A small content service: users, posts, comments, tags. Django + Ninja + Postgres
 Prereqs:
 
 - [mise](https://mise.jdx.dev/) — manages the Python toolchain and uv.
-- A running PostgreSQL 16 instance on `localhost:5432` with a database called `backend_devops_interview` accessible to `postgres`/`postgres`. (Local install, `brew install postgresql@16`, host-mode docker, whatever you have.)
+- Docker with the Docker Compose plugin — runs the local PostgreSQL database.
 
 Steps:
 
 ```sh
 mise install
 uv sync
-createdb backend_devops_interview        # or however you create it
+docker compose up -d postgres
 uv run python manage.py migrate
 uv run python manage.py seed
 uv run python manage.py runserver
@@ -23,6 +23,9 @@ uv run python manage.py runserver
 API docs at <http://localhost:8000/api/docs>.
 
 Seeding writes ~100k posts and ~500k comments. Expect a few minutes.
+
+To stop the database, run `docker compose down`. To reset all local database data,
+run `docker compose down -v`.
 
 ## What the API does
 
