@@ -83,13 +83,13 @@ class Command(BaseCommand):
                     cum_weights=author_cum_weights,
                     k=batch_size,
                 )
-                chunk = []
+                post_chunk = []
                 for author_id in author_batch:
                     if random.random() < 0.5:
                         ts = _random_time(recency_cutoff, now)
                     else:
                         ts = _random_time(three_years_ago, now)
-                    chunk.append(
+                    post_chunk.append(
                         Post(
                             author_id=author_id,
                             title=random.choice(title_pool),
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                             created_at=ts,
                         )
                     )
-                Post.objects.bulk_create(chunk, batch_size=BATCH)
+                Post.objects.bulk_create(post_chunk, batch_size=BATCH)
 
         post_ids = list(Post.objects.values_list("id", flat=True))
 
@@ -139,9 +139,9 @@ class Command(BaseCommand):
                 cum_weights=author_cum_weights,
                 k=batch_size,
             )
-            chunk = []
+            comment_chunk = []
             for pid, aid in zip(post_batch, author_batch, strict=False):
-                chunk.append(
+                comment_chunk.append(
                     Comment(
                         post_id=pid,
                         author_id=aid,
@@ -149,7 +149,7 @@ class Command(BaseCommand):
                         created_at=_random_time(three_years_ago, now),
                     )
                 )
-            Comment.objects.bulk_create(chunk, batch_size=BATCH)
+            Comment.objects.bulk_create(comment_chunk, batch_size=BATCH)
 
         self.stdout.write(self.style.SUCCESS("Done."))
 

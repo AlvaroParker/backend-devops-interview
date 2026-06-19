@@ -7,7 +7,7 @@ POSTGRES_DB := backend_devops_interview
 POSTGRES_USER := postgres
 WAIT_TIMEOUT := 60
 
-.PHONY: check-deps reset-postgres postgres wait-postgres migrate seed runserver init
+.PHONY: check-deps reset-postgres postgres wait-postgres migrate seed runserver init format format-check lint typecheck ci
 
 check-deps:
 	@command -v uv >/dev/null 2>&1 || { echo "uv is required: https://docs.astral.sh/uv/getting-started/installation/"; exit 1; }
@@ -46,3 +46,17 @@ runserver:
 	$(PYTHON) manage.py runserver
 
 init: reset-postgres postgres wait-postgres migrate seed runserver
+
+format:
+	uv run ruff format .
+
+format-check:
+	uv run ruff format --check .
+
+lint:
+	uv run ruff check .
+
+typecheck:
+	uv run mypy blog core manage.py conftest.py
+
+ci: format-check lint typecheck
