@@ -1,5 +1,6 @@
 import random
 from datetime import timedelta
+from itertools import accumulate
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -69,19 +70,25 @@ class Command(BaseCommand):
         body_pool = [fake.text(max_nb_chars=600) for _ in range(BODY_POOL_SIZE)]
 
         author_weights = _power_law_weights(len(user_ids), top_n=10, top_share=0.3)
+        author_cum_weights = list(accumulate(author_weights))
 
         self.stdout.write(f"Seeding {NUM_POSTS} posts...")
         recent_days = 180
         recency_cutoff = now - timedelta(days=recent_days)
         with transaction.atomic():
             for chunk_start in range(0, NUM_POSTS, BATCH):
+                batch_size = min(BATCH, NUM_POSTS - chunk_start)
+                author_batch = random.choices(
+                    user_ids,
+                    cum_weights=author_cum_weights,
+                    k=batch_size,
+                )
                 chunk = []
-                for i in range(chunk_start, min(chunk_start + BATCH, NUM_POSTS)):
+                for author_id in author_batch:
                     if random.random() < 0.5:
                         ts = _random_time(recency_cutoff, now)
                     else:
                         ts = _random_time(three_years_ago, now)
-                    author_id = random.choices(user_ids, weights=author_weights, k=1)[0]
                     chunk.append(
                         Post(
                             author_id=author_id,
@@ -119,11 +126,21 @@ class Command(BaseCommand):
 
         self.stdout.write(f"Seeding {NUM_COMMENTS} comments...")
         post_weights = _long_tail_weights(len(post_ids), top_pct=0.01, top_share=0.5)
+        post_cum_weights = list(accumulate(post_weights))
         for chunk_start in range(0, NUM_COMMENTS, BATCH):
+            batch_size = min(BATCH, NUM_COMMENTS - chunk_start)
+            post_batch = random.choices(
+                post_ids,
+                cum_weights=post_cum_weights,
+                k=batch_size,
+            )
+            author_batch = random.choices(
+                user_ids,
+                cum_weights=author_cum_weights,
+                k=batch_size,
+            )
             chunk = []
-            for _ in range(chunk_start, min(chunk_start + BATCH, NUM_COMMENTS)):
-                pid = random.choices(post_ids, weights=post_weights, k=1)[0]
-                aid = random.choices(user_ids, weights=author_weights, k=1)[0]
+            for pid, aid in zip(post_batch, author_batch, strict=False):
                 chunk.append(
                     Comment(
                         post_id=pid,
