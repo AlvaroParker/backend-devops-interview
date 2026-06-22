@@ -37,3 +37,7 @@ AI transcript for this is available under `ai/transcript.md`
 - Enforce docs generation and code quality checks via CI.
 - Migrate to a `justfile` for task management just because :)
 - Enforce LSP config for common code editors.
+
+Main reasons to delay this is because is not a priority and does not improve the developer experience much which was my main focus for this test :)
+
+ps: I have the habit to write in english. Specially for writing up notes, documentation and programming :)
