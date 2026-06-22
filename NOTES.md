@@ -15,6 +15,16 @@
 
 - Setup CI pipeline with GitHub Actions.
 
+## Changes made on github:
+
+- Enforce squash-rebase when merging PRs to ensure a clean commit history.
+- Enforce CI jobs pass before merging PRs.
+- Disable force commits to main
+- Enforce branch protection rules to prevent direct pushes to main.
+- Enable auto merging
+- Require PR to commit to main
+- Require linear history
+
 ## Seed improvements:
 
 - Improved seed data generation speed. Specifically the comments, now weights are precomputed.
