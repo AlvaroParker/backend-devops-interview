@@ -18,3 +18,12 @@
 ## Seed improvements:
 
 - Improved seed data generation speed. Specifically the comments, now weights are precomputed.
+
+## Speed up queries:
+
+- Added new indexes on models:
+  - `User.email` to speed up api endpoint `/api/users/find?email=foo-bar`
+  - partial `Post.created_at` index for published post endpoints: `GET /api/posts`, `/api/posts/search`, and `/api/posts/by-tag/{slug}`
+  - `Comment(post, created_at)` to speed up chronological comment loading for `GET /api/posts/{id}`
+
+- Enabled [`pg_trgm`](https://www.postgresql.org/docs/current/pgtrgm.html) and added trigram indexes on `Post.title` and `Post.body` to speed up `icontains` search.

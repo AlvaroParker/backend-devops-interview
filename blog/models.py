@@ -1,4 +1,7 @@
+from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.db import models
+from django.db.models import Q
+from django.db.models.functions import Cast, Upper
 from django.utils import timezone
 
 
@@ -11,6 +14,11 @@ class User(models.Model):
 
     def __str__(self) -> str:
         return self.username
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["email"], name="blog_user_email_idx"),
+        ]
 
 
 class Tag(models.Model):
@@ -35,9 +43,39 @@ class Post(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["-created_at"],
+                name="blog_post_pub_created_idx",
+                condition=Q(is_published=True),
+            ),
+            GinIndex(
+                OpClass(
+                    Upper(Cast("title", output_field=models.TextField())),
+                    name="gin_trgm_ops",
+                ),
+                name="blog_post_title_pub_trgm_idx",
+                condition=Q(is_published=True),
+            ),
+            GinIndex(
+                OpClass(
+                    Upper(Cast("body", output_field=models.TextField())),
+                    name="gin_trgm_ops",
+                ),
+                name="blog_post_body_pub_trgm_idx",
+                condition=Q(is_published=True),
+            ),
+        ]
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     body = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["post", "created_at"], name="blog_comment_post_created_idx"),
+        ]
