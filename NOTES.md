@@ -27,3 +27,17 @@
   - `Comment(post, created_at)` to speed up chronological comment loading for `GET /api/posts/{id}`
 
 - Enabled [`pg_trgm`](https://www.postgresql.org/docs/current/pgtrgm.html) and added trigram indexes on `Post.title` and `Post.body` to speed up `icontains` search.
+
+AI transcript for this is available under `ai/transcript.md`
+
+## TODOS if more time:
+
+- Add actual performance monitoring and optimization to be able to compare the improvements before and after the changes.
+- Setup a `Dockerfile` image for the application to be able to easily deploy in prod via docker image registry.
+- Enforce docs generation and code quality checks via CI.
+- Migrate to a `justfile` for task management just because :)
+- Enforce LSP config for common code editors.
+
+Main reasons to delay this is because is not a priority and does not improve the developer experience much which was my main focus for this test :)
+
+ps: I have the habit to write in english. Specially for writing up notes, documentation and programming :)
